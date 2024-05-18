@@ -3,46 +3,68 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
- 
+
 public class Database {
- 
-public static void main(String[] args) {
-   try {
-Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/FMS", "root", "Jaya1234!");//Establishing connection
-System.out.println("Connected With the database successfully");
-//Creating PreparedStatement object
-PreparedStatement preparedStatement=connection.prepareStatement("insert into FlightManagementSystem values(?,?,?,?,?)");
-//Setting values for Each Parameter
-preparedStatement.setString(1,"abc001");
-       preparedStatement.setString(2,"AIR");
-       preparedStatement.setString(3, "BOM");
-       preparedStatement.setString(4, "PNQ");
-       preparedStatement.setString(5, "3000");
-       //Executing Query
-       //preparedStatement.executeUpdate();
-       //System.out.println("data inserted successfully");
-     //Using SQL SELECT Query
-       //PreparedStatement preparedStatement=connection.prepareStatement("select * from FlightManagementSystem");
-       //Creating Java ResultSet object
-       //ResultSet resultSet=preparedStatement.executeQuery();
-       //while(resultSet.next()){
-            //String RegID=resultSet.getString("RegID");
-            //String Airline=resultSet.getString("Airline");
-            //String Dep=resultSet.getString("DepAirport");
-            //String Des=resultSet.getString("DesAirport");
-            //String Dur=resultSet.getString("TimeDur");
-            //Printing Results
-            //System.out.println(RegID+" "+Airline+" "+Dep+" "+Des+" "+Dur);
-//Using SQL UPDATE query to update data in the table
-//PreparedStatement preparedStatement=connection.prepareStatement("update FlightManagementSystem set RegID=?");
-//preparedStatement.setString(1,"abc002");
 
-//preparedStatement.executeUpdate();
-//System.out.println("data updated successfully"); 
- 
-} catch (SQLException e) {
-System.out.println("Error while connecting to the database"+e.getMessage());
+    public static void main(String[] args) {
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
+        ResultSet resultSet = null;
+
+        try {
+            // Establishing connection
+            connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/FMS", "root", "Jaya1234!");
+            System.out.println("Connected with the database successfully");
+
+            // Inserting data
+            String insertQuery = "INSERT INTO FlightManagementSystem (RegID, Airline, DepAirport, DesAirport, TimeDur) VALUES (?, ?, ?, ?, ?)";
+            preparedStatement = connection.prepareStatement(insertQuery);
+            preparedStatement.setString(1, "abc001");
+            preparedStatement.setString(2, "AIR");
+            preparedStatement.setString(3, "BOM");
+            preparedStatement.setString(4, "PNQ");
+            preparedStatement.setString(5, "3000");
+            preparedStatement.executeUpdate();
+            System.out.println("Data inserted successfully");
+
+            // Selecting data
+            String selectQuery = "SELECT * FROM FlightManagementSystem";
+            preparedStatement = connection.prepareStatement(selectQuery);
+            resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()) {
+                String regID = resultSet.getString("RegID");
+                String airline = resultSet.getString("Airline");
+                String dep = resultSet.getString("DepAirport");
+                String des = resultSet.getString("DesAirport");
+                String dur = resultSet.getString("TimeDur");
+                System.out.println(regID + " " + airline + " " + dep + " " + des + " " + dur);
+            }
+
+            // Updating data
+            String updateQuery = "UPDATE FlightManagementSystem SET RegID=? WHERE RegID=?";
+            preparedStatement = connection.prepareStatement(updateQuery);
+            preparedStatement.setString(1, "abc002");
+            preparedStatement.setString(2, "abc001"); // Update the record where RegID is abc001
+            preparedStatement.executeUpdate();
+            System.out.println("Data updated successfully");
+
+        } catch (SQLException e) {
+            System.out.println("Error while connecting to the database: " + e.getMessage());
+        } finally {
+            // Closing resources
+            try {
+                if (resultSet != null) {
+                    resultSet.close();
+                }
+                if (preparedStatement != null) {
+                    preparedStatement.close();
+                }
+                if (connection != null) {
+                    connection.close();
+                }
+            } catch (SQLException e) {
+                System.out.println("Error while closing resources: " + e.getMessage());
+            }
+        }
+    }
 }
-
- 
-}}
